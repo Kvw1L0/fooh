@@ -26,21 +26,25 @@
     }
 
     /* Estilos para la imagen que funcionará como botón */
-    #playButton {
+    #videoButton {
       max-width: 400px; /* Ajusta el tamaño de tu imagen de "Play" */
       cursor: pointer;
       transition: transform 0.2s ease;
       border-radius: 50%; /* Opcional: para botones redondos */
       /*box-shadow: 0 0 35px rgba(255, 255, 255, 0.3);*/
     }
-    #playButton:hover {
+    #videoButton:hover {
       transform: scale(1.1); /* Efecto al pasar el mouse */
     }
   </style>
 </head>
 <body>
 
-  <img src="button.png" id="playButton" alt="Iniciar Video" />
+  <video
+  id="videoButton"
+  src="button.mp4"  >   autoplay  >   muted    >   loop      >   playsinline > >
+  >   <img src="button.png" alt="Iniciar Video" />
+</video>
 
   <video 
     id="miVideo"
@@ -52,60 +56,67 @@
   </video>
 
   <script>
-    // Esperamos a que la página se cargue
-    document.addEventListener('DOMContentLoaded', function() {
-      
-      // Obtenemos el botón (imagen) y el video
-      const video = document.getElementById('miVideo');
-      const playButton = document.getElementById('playButton');
+    // Esperamos a que la página se cargue
+    document.addEventListener('DOMContentLoaded', function() {
+      
+      // Obtenemos el video-botón y el video principal
+      const video = document.getElementById('miVideo');
+      const videoButton = document.getElementById('videoButton'); // ID del video-botón
 
-      // 1. Añadimos el "escuchador" de clics a la IMAGEN
-      playButton.addEventListener('click', function() {
-        
-        // 2. Hacemos que el botón desaparezca y el video aparezca
-        playButton.style.display = 'none';
-        video.style.display = 'block';
+      // 1. Añadimos el "escuchador" de clics al VIDEO-BOTÓN
+      videoButton.addEventListener('click', function() {
+        
+        // Pausamos el video-botón para ahorrar recursos
+        videoButton.pause(); 
 
-        // 3. Llamamos a nuestra función para ponerlo en pantalla completa
-        openFullscreen(video);
+        // 2. Hacemos que el botón desaparezca y el video aparezca
+        videoButton.style.display = 'none';
+        video.style.display = 'block';
 
-        // 4. Le damos a "play" (¡con sonido!)
-        video.play();
-      });
+        // Nos aseguramos de que el video principal tenga sonido
+        video.muted = false; 
 
-      /* * Esta función intenta abrir el modo de pantalla completa
-       * de forma compatible con todos los navegadores.
-      */
-      function openFullscreen(element) {
-        if (element.requestFullscreen) {
-          element.requestFullscreen();
-        } else if (element.webkitEnterFullscreen) { // Específico para Safari en iOS
-          element.webkitEnterFullscreen();
-        } else if (element.mozRequestFullScreen) { // Firefox
-          element.mozRequestFullScreen();
-        } else if (element.webkitRequestFullscreen) { // Chrome/Safari
-          element.webkitRequestFullscreen();
-        } else if (element.msRequestFullscreen) { // IE/Edge
-          element.msRequestFullscreen();
-        }
-      }
+        // 3. Llamamos a nuestra función para ponerlo en pantalla completa
+        openFullscreen(video);
 
-      // Opcional: Si el usuario sale de pantalla completa (p.ej. con 'Esc'),
-      // pausamos el video y volvemos a mostrar el botón de play.
-      function exitHandler() {
-        if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
-          video.pause();
-          video.style.display = 'none';
-          playButton.style.display = 'block';
-        }
-      }
+        // 4. Le damos a "play" (¡con sonido!)
+        video.play();
+      });
 
-      document.addEventListener('fullscreenchange', exitHandler);
-      document.addEventListener('webkitfullscreenchange', exitHandler);
-      document.addEventListener('mozfullscreenchange', exitHandler);
-      document.addEventListener('MSFullscreenChange', exitHandler);
-    });
-  </script>
+      /* * Esta función intenta abrir el modo de pantalla completa
+       * de forma compatible con todos los navegadores.
+      */
+      function openFullscreen(element) {
+        if (element.requestFullscreen) {
+          element.requestFullscreen();
+        } else if (element.webkitEnterFullscreen) { // Específico para Safari en iOS
+          element.webkitEnterFullscreen();
+        } else if (element.mozRequestFullScreen) { // Firefox
+          element.mozRequestFullScreen();
+        } else if (element.webkitRequestFullscreen) { // Chrome/Safari
+          element.webkitRequestFullscreen();
+  _     } else if (element.msRequestFullscreen) { // IE/Edge
+          element.msRequestFullscreen();
+        }
+      }
 
+      // Opcional: Si el usuario sale de pantalla completa (p.ej. con 'Esc'),
+      // pausamos el video y volvemos a mostrar el botón de play.
+      function exitHandler() {
+        if (!document.fullscreenElement && !document.webkitIsFullScreen && !document.mozFullScreen && !document.msFullscreenElement) {
+          video.pause();
+          video.currentTime = 0; // Rebobina el video principal
+          video.style.display = 'none';
+          videoButton.style.display = 'block'; // Muestra el video-botón
+          videoButton.play(); // Reanuda el loop del botón
+  _     }
+      }
+
+      document.addEventListener('fullscreenchange', exitHandler);
+      document.addEventListener('webkitfullscreenchange', exitHandler);
+      document.addEventListener('mozfullscreenchange', exitHandler);
+      document.addEventListener('MSFullscreenChange', exitHandler);
+    });
+  </script>
 </body>
 </html>
